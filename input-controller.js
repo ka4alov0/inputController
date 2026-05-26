@@ -73,6 +73,9 @@ class InputController{
                     if(actionData.keys.includes(event.keyCode)){
                         this.pressedKeys.add(event.keyCode)
                         this.activeActions.add(actionName)
+                        this.target.dispatchEvent(new CustomEvent(InputController.ACTION_ACTIVATED, {
+                            detail: actionName
+                        }))
                     }
                 }
             }
@@ -88,6 +91,9 @@ class InputController{
                     if(actionData.keys.includes(event.keyCode)){
                         this.pressedKeys.delete(event.keyCode)
                         this.activeActions.delete(actionName)
+                        this.target.dispatchEvent(new CustomEvent(InputController.ACTION_DEACTIVATED, {
+                            detail: actionName
+                        }))
                     }
                 }
             }
