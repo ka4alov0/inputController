@@ -71,7 +71,7 @@ class InputController{
             for(const [actionName, actionData] of this.actions){
                 if(actionData.enabled === true){
                     if(actionData.keys.includes(event.keyCode)){
-                        const isActive = this.activeActions.has(actionName)
+                        const isActive = this.isActionActive(actionName)
                         this.pressedKeys.add(event.keyCode)
                         this.activeActions.add(actionName)   
                         // console.log(isActive)
@@ -96,7 +96,7 @@ class InputController{
                 if(actionData.enabled === true){
                     if(actionData.keys.includes(event.keyCode)){
                         const isActive = actionData.keys.some((key) => {
-                            return this.pressedKeys.has(key)
+                            return this.isKeyPressed(key)
                         })
                         if(!isActive){
                             this.activeActions.delete(actionName)
