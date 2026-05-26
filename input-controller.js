@@ -71,11 +71,16 @@ class InputController{
             for(const [actionName, actionData] of this.actions){
                 if(actionData.enabled === true){
                     if(actionData.keys.includes(event.keyCode)){
+                        const isActive = this.activeActions.has(actionName)
                         this.pressedKeys.add(event.keyCode)
-                        this.activeActions.add(actionName)
-                        this.target.dispatchEvent(new CustomEvent(InputController.ACTION_ACTIVATED, {
-                            detail: actionName
-                        }))
+                        this.activeActions.add(actionName)   
+                        // console.log(isActive)
+                        if(!isActive){
+                            this.target.dispatchEvent(new CustomEvent(InputController.ACTION_ACTIVATED, {
+                                detail: actionName
+                            }))
+                            // console.log(isActive)
+                        }
                     }
                 }
             }
@@ -89,11 +94,14 @@ class InputController{
             for(const [actionName, actionData] of this.actions){
                 if(actionData.enabled === true){
                     if(actionData.keys.includes(event.keyCode)){
+                        const isActive = this.activeActions.has(actionName)
                         this.pressedKeys.delete(event.keyCode)
                         this.activeActions.delete(actionName)
-                        this.target.dispatchEvent(new CustomEvent(InputController.ACTION_DEACTIVATED, {
-                            detail: actionName
-                        }))
+                        if(!isActive){
+                            this.target.dispatchEvent(new CustomEvent(InputController.ACTION_DEACTIVATED, {
+                                detail: actionName
+                            }))
+                        }
                     }
                 }
             }
