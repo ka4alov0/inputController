@@ -85,19 +85,21 @@ class InputController{
                 }
             }
         }
-        console.log(this.activeActions)
-        console.log(this.pressedKeys)
+        // console.log(this.activeActions)
+        // console.log(this.pressedKeys)
     }
 
     keyUp(event){
         if(this.enabled){
+            this.pressedKeys.delete(event.keyCode)
             for(const [actionName, actionData] of this.actions){
                 if(actionData.enabled === true){
                     if(actionData.keys.includes(event.keyCode)){
-                        const isActive = this.activeActions.has(actionName)
-                        this.pressedKeys.delete(event.keyCode)
-                        this.activeActions.delete(actionName)
+                        const isActive = actionData.keys.some((key) => {
+                            return this.pressedKeys.has(key)
+                        })
                         if(!isActive){
+                            this.activeActions.delete(actionName)
                             this.target.dispatchEvent(new CustomEvent(InputController.ACTION_DEACTIVATED, {
                                 detail: actionName
                             }))
@@ -106,8 +108,8 @@ class InputController{
                 }
             }
         }
-        console.log(this.activeActions)
-        console.log(this.pressedKeys)
+        // console.log(this.activeActions)
+        // console.log(this.pressedKeys)
     }
 
     controllerOn(){
@@ -120,3 +122,6 @@ class InputController{
         this.pressedKeys.clear()
     }
 }
+
+// document.addEventListener( InputController.ACTION_ACTIVATED, (event) => {console.log('down')})
+// document.addEventListener( InputController.ACTION_DEACTIVATED, (event) => {console.log('up')})
