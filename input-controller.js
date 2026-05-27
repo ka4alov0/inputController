@@ -63,8 +63,8 @@ class InputController{
             this.actionsSource.set(actionName, new Set())
         }
         const source = this.actionsSource.get(actionName)
-        source.add(plugin)
         const isActive = source.size > 0
+        source.add(plugin)
         this.activeActions.add(actionName)
         if(!isActive){
             this.target.dispatchEvent(new CustomEvent(InputController.ACTION_ACTIVATED, {
@@ -79,7 +79,7 @@ class InputController{
         const isActive = source.size > 0
         if(!isActive){
             this.activeActions.delete(actionName)
-            this.target.dispatchEvent(new CustomEvent(InputController.ACTION_ACTIVATED, {
+            this.target.dispatchEvent(new CustomEvent(InputController.ACTION_DEACTIVATED, {
                 detail: actionName
             }))
         }
@@ -95,3 +95,6 @@ class InputController{
         this.pressedKeys.clear()
     }
 }
+
+document.addEventListener( InputController.ACTION_ACTIVATED, (event) => {console.log('down')})
+document.addEventListener( InputController.ACTION_DEACTIVATED, (event) => {console.log('up')})
