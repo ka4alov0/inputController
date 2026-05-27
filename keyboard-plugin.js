@@ -24,24 +24,13 @@ class KeyboardPlugin{
     }
 
     keyDown(event){
+        let pressed = event.button
         console.log(this.controller.focused)
         if(this.controller.enabled){
             for(const [actionName, actionData] of this.controller.actions){
                 if(actionData.enabled){
                     if(actionData.keys.keyboard.includes(event.keyCode)){
-                        const keyboardActive = actionData.keys.keyboard.some((key) => {
-                            return this.controller.isKeyPressed(key)
-                        })
-                        const mouseActive = actionData.keys.mouse.some((key) => {
-                            return this.controller.isKeyPressed(key)
-                        })
-                        this.controller.pressedKeys.add(event.keyCode)
-                        this.controller.activeActions.add(actionName)
-                        if(!keyboardActive && !mouseActive){
-                            this.target.dispatchEvent(new CustomEvent(InputController.ACTION_ACTIVATED, {
-                                detail: actionName
-                            }))
-                        }
+                        this.controller.actionOn(actionName, actionData, pressed)
                     }
                 }
             }
@@ -54,18 +43,7 @@ class KeyboardPlugin{
             for(const [actionName, actionData] of this.controller.actions){
                 if(actionData.enabled){
                     if(actionData.keys.keyboard.includes(event.keyCode)){
-                        const keyboardActive = actionData.keys.keyboard.some((key) => {
-                            return this.controller.isKeyPressed(key)
-                        })
-                        const mouseActive = actionData.keys.mouse.some((key) => {
-                            return this.controller.isKeyPressed(key)
-                        })
-                        if(!keyboardActive && !mouseActive){
-                            this.controller.activeActions.delete(actionName)
-                            this.controller.target.dispatchEvent(new CustomEvent(InputController.ACTION_DEACTIVATED, {
-                                detail: actionName
-                            }))
-                        }
+                        this.controller.actionOff(actionName, actionData)
                     }
                 }
             }

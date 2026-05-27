@@ -69,6 +69,37 @@ class InputController{
         else return false
     }
 
+    actionOn(actionName, actionData, pressed){
+        const keyboardActive = actionData.keys.keyboard.some((key) => {
+            return this.isKeyPressed(key)
+        })
+        const mouseActive = actionData.keys.mouse.some((key) => {
+            return this.isKeyPressed(key)
+        })
+        this.pressedKeys.add(pressed)
+        this.activeActions.add(actionName)
+        if(!keyboardActive && !mouseActive){
+            this.target.dispatchEvent(new CustomEvent(InputController.ACTION_ACTIVATED, {
+                detail: actionName
+            }))
+        }
+    }
+
+    actionOff(actionName, actionData){
+        const keyboardActive = actionData.keys.keyboard.some((key) => {
+            return this.isKeyPressed(key)
+        })
+        const mouseActive = actionData.keys.mouse.some((key) => {
+            return this.isKeyPressed(key)
+        })
+        if(!keyboardActive && !mouseActive){
+            this.activeActions.delete(actionName)
+            this.target.dispatchEvent(new CustomEvent(InputController.ACTION_DEACTIVATED, {
+                detail: actionName
+            }))
+        }
+    }
+
     controllerOn(){
         this.enabled = true
     }
