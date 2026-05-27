@@ -12,16 +12,24 @@ controllerOn.addEventListener('click', (event) => {controller.controllerOn()})
 controllerOff.addEventListener('click', (event) => {controller.controllerOff()})
 enableActionLeft.addEventListener('click', (event) => {controller.enableAction('left')})
 disableActionLeft.addEventListener('click', (event) => {controller.disableAction('left')})
-bindSpace.addEventListener('click', (event) => {controller.bindActions({"jump": {keys: [32]}})})
+bindSpace.addEventListener('click', (event) => {controller.bindActions({"jump": {mouse: [1], keyboard: [32]}})})
 
 const controller = new InputController({
     "left": {
-        keys: [37,65],
+        mouse: [0],
+        keyboard: [37,65],
     },
     "right": {
-        keys: [39,68]
+        mouse: [2],
+        keyboard: [39,68]
     }
 }, document)
+
+const keyboardPlugin = new KeyboardPlugin()
+const mousePlugin = new MousePlugin()
+
+controller.addPlugin(keyboardPlugin)
+controller.addPlugin(mousePlugin)
 
 const gameArea = document.getElementById('gameArea')
 const ctx = gameArea.getContext('2d')

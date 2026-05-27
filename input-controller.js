@@ -7,49 +7,52 @@ class InputController{
     static ACTION_DEACTIVATED = "input-controller:action-deactivated"
 
     constructor(actionsToBind = {}, target=document){
-        this.keyDown = this.keyDown.bind(this)
-        this.keyUp = this.keyUp.bind(this)
         this.target = target
+        this.plugins = new Set()
         this.activeActions = new Set()
         this.pressedKeys = new Set()
         this.actions = new Map()
         this.bindActions(actionsToBind)
-        this.attach(target)
     }
 
     bindActions(actionsToBind){
         for(let actionName in actionsToBind){
-            this.actions.set(actionName, {keys: actionsToBind[actionName].keys, enabled: true})
+            
+            this.actions.set(actionName, {keys: actionsToBind[actionName], enabled: true})
+            console.log(actionsToBind[actionName])
         }
-        // console.log(this.actions)
+        console.log(this.actions)
+    }
+
+    addPlugin(plugin){
+        plugin.controller = this
+        plugin.attach()
+        this.plugins.add(plugin)
+    }
+
+    attach(){
+        controller.focused = true
+        for(const plugin of this.plugins){
+            plugin.attach()
+        }
+    }
+
+    detach(){
+        controller.focused = false
+        for(const plugin of this.plugins){
+            plugin.detach()
+        }
     }
 
     enableAction(actionName){
-        // enabled у action делает true, но сначала надо этот enabled добавить
         this.actions.get(actionName).enabled = true
         console.log(this.actions.get(actionName).enabled)
     }
 
     disableAction(actionName){
-        // enabled у action делает false
         this.actions.get(actionName).enabled = false
         console.log(this.actions.get(actionName).enabled)
-    }
-
-    attach(target, dontEnable = false){
-        this.focused = true
-        if(this.focused){
-            this.target.addEventListener('keydown', this.keyDown)
-            this.target.addEventListener('keyup', this.keyUp)
-        }
-    }
-
-    detach(){
-        this.focused = false
-        this.target.removeEventListener('keydown', this.keyDown)
-        this.target.removeEventListener('keyup', this.keyUp)
-        this.activeActions.clear()
-        this.pressedKeys.clear()
+        this.activeActions.delete(actionName)
     }
 
     isActionActive(action){
@@ -66,52 +69,6 @@ class InputController{
         else return false
     }
 
-    keyDown(event){
-        if(this.enabled){
-            for(const [actionName, actionData] of this.actions){
-                if(actionData.enabled === true){
-                    if(actionData.keys.includes(event.keyCode)){
-                        const isActive = this.isActionActive(actionName)
-                        this.pressedKeys.add(event.keyCode)
-                        this.activeActions.add(actionName)   
-                        // console.log(isActive)
-                        if(!isActive){
-                            this.target.dispatchEvent(new CustomEvent(InputController.ACTION_ACTIVATED, {
-                                detail: actionName
-                            }))
-                            // console.log(isActive)
-                        }
-                    }
-                }
-            }
-        }
-        // console.log(this.activeActions)
-        // console.log(this.pressedKeys)
-    }
-
-    keyUp(event){
-        if(this.enabled){
-            this.pressedKeys.delete(event.keyCode)
-            for(const [actionName, actionData] of this.actions){
-                if(actionData.enabled === true){
-                    if(actionData.keys.includes(event.keyCode)){
-                        const isActive = actionData.keys.some((key) => {
-                            return this.isKeyPressed(key)
-                        })
-                        if(!isActive){
-                            this.activeActions.delete(actionName)
-                            this.target.dispatchEvent(new CustomEvent(InputController.ACTION_DEACTIVATED, {
-                                detail: actionName
-                            }))
-                        }
-                    }
-                }
-            }
-        }
-        // console.log(this.activeActions)
-        // console.log(this.pressedKeys)
-    }
-
     controllerOn(){
         this.enabled = true
     }
@@ -122,6 +79,3 @@ class InputController{
         this.pressedKeys.clear()
     }
 }
-
-// document.addEventListener( InputController.ACTION_ACTIVATED, (event) => {console.log('down')})
-// document.addEventListener( InputController.ACTION_DEACTIVATED, (event) => {console.log('up')})
