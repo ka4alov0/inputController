@@ -10,18 +10,16 @@ class InputController{
         this.target = target
         this.plugins = new Set()
         this.activeActions = new Set()
-        this.pressedKeys = new Set()
+        // this.pressedKeys = new Set()
+        this.actionsSource = new Map()
         this.actions = new Map()
         this.bindActions(actionsToBind)
     }
 
     bindActions(actionsToBind){
         for(let actionName in actionsToBind){
-            
             this.actions.set(actionName, {keys: actionsToBind[actionName], enabled: true})
-            console.log(actionsToBind[actionName])
         }
-        console.log(this.actions)
     }
 
     addPlugin(plugin){
@@ -46,12 +44,10 @@ class InputController{
 
     enableAction(actionName){
         this.actions.get(actionName).enabled = true
-        console.log(this.actions.get(actionName).enabled)
     }
 
     disableAction(actionName){
         this.actions.get(actionName).enabled = false
-        console.log(this.actions.get(actionName).enabled)
         this.activeActions.delete(actionName)
     }
 
@@ -62,39 +58,28 @@ class InputController{
         else return false
     }
 
-    isKeyPressed(keyCode){
-        if(this.pressedKeys.has(keyCode)){
-            return true
+    actionOn(actionName, plugin){
+        if(!this.actionsSource.has(actionName)){
+            this.actionsSource.set(actionName, new Set())
         }
-        else return false
-    }
-
-    actionOn(actionName, actionData, pressed){
-        const keyboardActive = actionData.keys.keyboard.some((key) => {
-            return this.isKeyPressed(key)
-        })
-        const mouseActive = actionData.keys.mouse.some((key) => {
-            return this.isKeyPressed(key)
-        })
-        this.pressedKeys.add(pressed)
+        const source = this.actionsSource.get(actionName)
+        source.add(plugin)
+        const isActive = source.size > 0
         this.activeActions.add(actionName)
-        if(!keyboardActive && !mouseActive){
+        if(!isActive){
             this.target.dispatchEvent(new CustomEvent(InputController.ACTION_ACTIVATED, {
                 detail: actionName
             }))
         }
     }
 
-    actionOff(actionName, actionData){
-        const keyboardActive = actionData.keys.keyboard.some((key) => {
-            return this.isKeyPressed(key)
-        })
-        const mouseActive = actionData.keys.mouse.some((key) => {
-            return this.isKeyPressed(key)
-        })
-        if(!keyboardActive && !mouseActive){
+    actionOff(actionName, plugin){
+        const source = this.actionsSource.get(actionName)
+        source.delete(plugin)
+        const isActive = source.size > 0
+        if(!isActive){
             this.activeActions.delete(actionName)
-            this.target.dispatchEvent(new CustomEvent(InputController.ACTION_DEACTIVATED, {
+            this.target.dispatchEvent(new CustomEvent(InputController.ACTION_ACTIVATED, {
                 detail: actionName
             }))
         }

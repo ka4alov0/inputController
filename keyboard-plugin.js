@@ -3,7 +3,9 @@ class KeyboardPlugin{
     constructor(target = document){
         this.keyDown = this.keyDown.bind(this)
         this.keyUp = this.keyUp.bind(this)
+        this.pressedKeys = new Set()
         this.target = target
+        this.active = new Set()
     }
     
     attach(){
@@ -18,17 +20,17 @@ class KeyboardPlugin{
             this.target.removeEventListener('keydown', this.keyDown)
             this.target.removeEventListener('keyup', this.keyUp)
             this.controller.activeActions.clear()
-            this.controller.pressedKeys.clear()
+            this.pressedKeys.clear()
         }
     }
 
     keyDown(event){
-        let pressed = event.button
         if(this.controller.enabled){
             for(const [actionName, actionData] of this.controller.actions){
                 if(actionData.enabled){
                     if(actionData.keys.keyboard.includes(event.keyCode)){
-                        this.controller.actionOn(actionName, actionData, pressed)
+                        this.pressedKeys.add(event.keyCode)
+                        this.controller.actionOn(actionName, this)
                     }
                 }
             }
@@ -37,11 +39,16 @@ class KeyboardPlugin{
 
     keyUp(event){
         if(this.controller.enabled){
-            this.controller.pressedKeys.delete(event.keyCode)
+            this.pressedKeys.delete(event.keyCode)
             for(const [actionName, actionData] of this.controller.actions){
                 if(actionData.enabled){
                     if(actionData.keys.keyboard.includes(event.keyCode)){
-                        this.controller.actionOff(actionName, actionData)
+                        const isActive = actionData.keys.keyboard.some((key) => {
+                            return this.pressedKeys.has(key)
+                        })
+                        if(!isActive){
+                            this.controller.actionOff(actionName, this)
+                        }
                     }
                 }
             }

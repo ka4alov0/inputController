@@ -3,7 +3,9 @@ class MousePlugin{
     constructor(target = document){
         this.mouseDown = this.mouseDown.bind(this)
         this.mouseUp = this.mouseUp.bind(this)
+        this.pressedButtons = new Set()
         this.target = target
+        this.active = new Set()
     }
 
     attach(){
@@ -18,17 +20,17 @@ class MousePlugin{
             this.target.removeEventListener('mousedown', this.mouseDown)
             this.target.removeEventListener('mouseup', this.mouseUp)
             this.controller.activeActions.clear()
-            this.controller.pressedKeys.clear()
+            this.pressedButtons.clear()
         }
     }
 
     mouseDown(event){
-        let pressed = event.button
         if(this.controller.enabled){
             for(const [actionName, actionData] of this.controller.actions){
                 if(actionData.enabled){
                     if(actionData.keys.mouse.includes(event.button)){
-                        this.controller.actionOn(actionName, actionData, pressed)
+                        this.pressedButtons.add(event.button)
+                        this.controller.actionOn(actionName, this)
                     }
                 }
             }
@@ -37,11 +39,16 @@ class MousePlugin{
 
     mouseUp(event){
         if(this.controller.enabled){
-            this.controller.pressedKeys.delete(event.button)
+            this.pressedButtons.delete(event.button)
             for(const [actionName, actionData] of this.controller.actions){
                 if(actionData.enabled){
                     if(actionData.keys.mouse.includes(event.button)){
-                        this.controller.actionOff(actionName, actionData)
+                        const isActive = actionData.keys.mouse.some((key) => {
+                            return this.pressedButtons.has(key)
+                        })
+                        if(!isActive){
+                            this.controller.actionOff(actionName, this)
+                        }
                     }
                 }
             }
