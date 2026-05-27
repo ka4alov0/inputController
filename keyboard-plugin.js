@@ -4,7 +4,6 @@ class KeyboardPlugin{
         this.keyDown = this.keyDown.bind(this)
         this.keyUp = this.keyUp.bind(this)
         this.target = target
-        this.attach
     }
     
     attach(){
@@ -25,7 +24,6 @@ class KeyboardPlugin{
 
     keyDown(event){
         let pressed = event.button
-        console.log(this.controller.focused)
         if(this.controller.enabled){
             for(const [actionName, actionData] of this.controller.actions){
                 if(actionData.enabled){
@@ -44,48 +42,6 @@ class KeyboardPlugin{
                 if(actionData.enabled){
                     if(actionData.keys.keyboard.includes(event.keyCode)){
                         this.controller.actionOff(actionName, actionData)
-                    }
-                }
-            }
-        }
-    }
-
-    oldKeyDown(event){
-        if(this.enabled){
-            for(const [actionName, actionData] of this.actions){
-                if(actionData.enabled === true){
-                    if(actionData.keys.includes(event.keyCode)){
-                        const isActive = this.controller.isActionActive(actionName)
-                        this.pressedKeys.add(event.keyCode)
-                        this.activeActions.add(actionName)   
-                        // console.log(isActive)
-                        if(!isActive){
-                            this.controller.target.dispatchEvent(new CustomEvent(InputController.ACTION_ACTIVATED, {
-                                detail: actionName
-                            }))
-                            // console.log(isActive)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    oldKeyUp(event){
-        if(this.enabled){
-            this.pressedKeys.delete(event.keyCode)
-            for(const [actionName, actionData] of this.actions){
-                if(actionData.enabled === true){
-                    if(actionData.keys.includes(event.keyCode)){
-                        const isActive = actionData.keys.some((key) => {
-                            return this.isKeyPressed(key)
-                        })
-                        if(!isActive){
-                            this.activeActions.delete(actionName)
-                            this.target.dispatchEvent(new CustomEvent(InputController.ACTION_DEACTIVATED, {
-                                detail: actionName
-                            }))
-                        }
                     }
                 }
             }
