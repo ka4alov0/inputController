@@ -1,13 +1,10 @@
-const attachBtn = document.getElementById('attach')
-const detachBtn = document.getElementById('detach')
+
 const controllerOn = document.getElementById('controllerOn')
 const controllerOff = document.getElementById('controllerOff')
 const enableActionLeft = document.getElementById('enableActionLeft')
 const disableActionLeft = document.getElementById('disableActionLeft')
 const bindSpace = document.getElementById('bindSpace')
 
-attachBtn.addEventListener('click', (event) => {controller.attach(document)})
-detachBtn.addEventListener('click', (event) => {controller.detach(document)})
 controllerOn.addEventListener('click', (event) => {controller.controllerOn()})
 controllerOff.addEventListener('click', (event) => {controller.controllerOff()})
 enableActionLeft.addEventListener('click', (event) => {controller.enableAction('left')})
@@ -23,7 +20,7 @@ const controller = new InputController({
         mouse: [2],
         keyboard: [39,68]
     }
-}, document)
+}, window)
 
 const keyboardPlugin = new KeyboardPlugin()
 const mousePlugin = new MousePlugin()

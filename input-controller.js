@@ -6,13 +6,14 @@ class InputController{
     static ACTION_ACTIVATED = "input-controller:action-activated"
     static ACTION_DEACTIVATED = "input-controller:action-deactivated"
 
-    constructor(actionsToBind = {}, target=document){
+    constructor(actionsToBind = {}, target=window){
         this.target = target
         this.plugins = new Set()
         this.activeActions = new Set()
-        // this.pressedKeys = new Set()
         this.actionsSource = new Map()
         this.actions = new Map()
+        this.target.addEventListener('focus', () => {this.attach()})
+        this.target.addEventListener('blur', () => {this.detach()})
         this.bindActions(actionsToBind)
     }
 
@@ -29,14 +30,14 @@ class InputController{
     }
 
     attach(){
-        controller.focused = true
+        this.focused = true
         for(const plugin of this.plugins){
             plugin.attach()
         }
     }
 
     detach(){
-        controller.focused = false
+        this.focused = false
         for(const plugin of this.plugins){
             plugin.detach()
         }
@@ -95,6 +96,3 @@ class InputController{
         this.pressedKeys.clear()
     }
 }
-
-document.addEventListener( InputController.ACTION_ACTIVATED, (event) => {console.log('down')})
-document.addEventListener( InputController.ACTION_DEACTIVATED, (event) => {console.log('up')})
